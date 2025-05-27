@@ -4,9 +4,9 @@ import CenterBlock from '@/components/CenterBlock/CenterBlock';
 import SideBar from '@/components/SideBar/SideBar';
 import Bar from '@/components/Bar/Bar';
 
-export default function Home() {
-  return (
-    <div className={styles.wrapper}>
+export default function PlaylistOfTheDay (){
+    return(
+         <div className={styles.wrapper}>
       <div className={styles.container}>
         <main className={styles.main}>
           <Navigation />
@@ -17,5 +17,5 @@ export default function Home() {
         <footer className="footer"></footer>
       </div>
     </div>
-  );
+    )
 }
