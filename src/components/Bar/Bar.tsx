@@ -11,41 +11,30 @@ export default function Bar() {
   const isPlay = useAppSelector((state) => state.tracks.isPlay);
   const dispatch = useAppDispatch();
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const showNotImplemented = () => alert('Ещё не реализовано');
+
   useEffect(() => {
     if (audioRef.current && currentTrack) {
-      audioRef.current.load(); // Перезагружаем аудио
-      if (isPlay) {
-        audioRef.current.play();
-      }
+      audioRef.current.src = currentTrack.track_file;
+      audioRef.current.load();
     }
-  }, [currentTrack, isPlay]);
+  }, [currentTrack]);
 
-  if (!currentTrack) return <></>;
+  useEffect(() => {
+    if (!audioRef.current) return;
+
+    if (isPlay) {
+      audioRef.current.play();
+    } else {
+      audioRef.current.pause();
+    }
+  }, [isPlay]);
 
   const togglePlay = () => {
     if (!audioRef.current) return;
 
-    if (isPlay) {
-      audioRef.current.pause();
-      dispatch(setIsPlay(false));
-    } else {
-      audioRef.current.play();
-      dispatch(setIsPlay(true));
-    }
+    dispatch(setIsPlay(!isPlay));
   };
-
-  /*   const playTrack = () => {
-    if (audioRef.current) {
-      audioRef.current.play();
-      dispatch(setIsPlay(true));
-    }
-  };
-  const pauseTrack = () => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      dispatch(setIsPlay(false));
-    }
-  }; */
 
   return (
     <div className={styles.bar}>
@@ -56,7 +45,10 @@ export default function Bar() {
           <div className={styles.bar__player}>
             <div className={styles.player__controls}>
               <div className={styles.player__btnPrev}>
-                <svg className={styles.player__btnPrevSvg}>
+                <svg
+                  className={styles.player__btnPrevSvg}
+                  onClick={showNotImplemented}
+                >
                   <use xlinkHref="/img/icon/sprite.svg#icon-prev"></use>
                 </svg>
               </div>
@@ -75,14 +67,20 @@ export default function Bar() {
                 </svg>
               </div>
               <div className={styles.player__btnNext}>
-                <svg className={styles.player__btnNextSvg}>
+                <svg
+                  className={styles.player__btnNextSvg}
+                  onClick={showNotImplemented}
+                >
                   <use xlinkHref="/img/icon/sprite.svg#icon-next"></use>
                 </svg>
               </div>
               <div
                 className={classnames(styles.player__btnRepeat, styles.btnIcon)}
               >
-                <svg className={styles.player__btnRepeatSvg}>
+                <svg
+                  className={styles.player__btnRepeatSvg}
+                  onClick={showNotImplemented}
+                >
                   <use xlinkHref="/img/icon/sprite.svg#icon-repeat"></use>
                 </svg>
               </div>
@@ -92,7 +90,10 @@ export default function Bar() {
                   styles.btnIcon,
                 )}
               >
-                <svg className={styles.player__btnShuffleSvg}>
+                <svg
+                  className={styles.player__btnShuffleSvg}
+                  onClick={showNotImplemented}
+                >
                   <use xlinkHref="/img/icon/sprite.svg#icon-shuffle"></use>
                 </svg>
               </div>

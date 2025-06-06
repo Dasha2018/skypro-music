@@ -7,6 +7,10 @@
   -ms-flex-direction: column;
   flex-direction: column;
   overflow-y: auto;
+  max-height: 500px;
+  scrollbar-width: thin;
+  scrollbar-color: #ffffff transparent;
+  padding-right: 8px;
 }
 
 .playlist__item {
