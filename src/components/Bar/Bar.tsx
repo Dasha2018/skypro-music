@@ -1,34 +1,86 @@
+'use client';
 import Link from 'next/link';
 import styles from './bar.module.css';
 import classnames from 'classnames';
+import { useAppDispatch, useAppSelector } from '@/store/store';
+import { useRef, useEffect } from 'react';
+import { setIsPlay } from '@/store/features/trackSlice';
 
 export default function Bar() {
+  const currentTrack = useAppSelector((state) => state.tracks.currentTrack);
+  const isPlay = useAppSelector((state) => state.tracks.isPlay);
+  const dispatch = useAppDispatch();
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const showNotImplemented = () => alert('Ещё не реализовано');
+
+  useEffect(() => {
+    if (audioRef.current && currentTrack) {
+      audioRef.current.src = currentTrack.track_file;
+      audioRef.current.load();
+    }
+  }, [currentTrack]);
+
+  useEffect(() => {
+    if (!audioRef.current) return;
+
+    if (isPlay) {
+      audioRef.current.play();
+    } else {
+      audioRef.current.pause();
+    }
+  }, [isPlay]);
+
+  const togglePlay = () => {
+    if (!audioRef.current) return;
+
+    dispatch(setIsPlay(!isPlay));
+  };
+
   return (
     <div className={styles.bar}>
+      <audio ref={audioRef} src={currentTrack?.track_file}></audio>
       <div className={styles.bar__content}>
         <div className={styles.bar__playerProgress}></div>
         <div className={styles.bar__playerBlock}>
           <div className={styles.bar__player}>
             <div className={styles.player__controls}>
               <div className={styles.player__btnPrev}>
-                <svg className={styles.player__btnPrevSvg}>
+                <svg
+                  className={styles.player__btnPrevSvg}
+                  onClick={showNotImplemented}
+                >
                   <use xlinkHref="/img/icon/sprite.svg#icon-prev"></use>
                 </svg>
               </div>
-              <div className={classnames(styles.player__btnPlay, styles.btn)}>
+              <div
+                className={classnames(styles.player__btnPlay, styles.btn)}
+                onClick={togglePlay}
+              >
                 <svg className={styles.player__btnPlaySvg}>
-                  <use xlinkHref="/img/icon/sprite.svg#icon-play"></use>
+                  <use
+                    xlinkHref={
+                      isPlay
+                        ? '/img/icon/sprite.svg#icon-pause'
+                        : '/img/icon/sprite.svg#icon-play'
+                    }
+                  ></use>
                 </svg>
               </div>
               <div className={styles.player__btnNext}>
-                <svg className={styles.player__btnNextSvg}>
+                <svg
+                  className={styles.player__btnNextSvg}
+                  onClick={showNotImplemented}
+                >
                   <use xlinkHref="/img/icon/sprite.svg#icon-next"></use>
                 </svg>
               </div>
               <div
                 className={classnames(styles.player__btnRepeat, styles.btnIcon)}
               >
-                <svg className={styles.player__btnRepeatSvg}>
+                <svg
+                  className={styles.player__btnRepeatSvg}
+                  onClick={showNotImplemented}
+                >
                   <use xlinkHref="/img/icon/sprite.svg#icon-repeat"></use>
                 </svg>
               </div>
@@ -38,7 +90,10 @@ export default function Bar() {
                   styles.btnIcon,
                 )}
               >
-                <svg className={styles.player__btnShuffleSvg}>
+                <svg
+                  className={styles.player__btnShuffleSvg}
+                  onClick={showNotImplemented}
+                >
                   <use xlinkHref="/img/icon/sprite.svg#icon-shuffle"></use>
                 </svg>
               </div>
@@ -53,12 +108,12 @@ export default function Bar() {
                 </div>
                 <div className={styles.trackPlay__author}>
                   <Link className={styles.trackPlay__authorLink} href="">
-                    Ты та...
+                    {currentTrack?.name || 'Неизвестный трек'}
                   </Link>
                 </div>
                 <div className={styles.trackPlay__album}>
                   <Link className={styles.trackPlay__albumLink} href="">
-                    Баста
+                    {currentTrack?.author || 'Неизвестный исполнитель'}
                   </Link>
                 </div>
               </div>
@@ -102,6 +157,15 @@ export default function Bar() {
                   )}
                   type="range"
                   name="range"
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  defaultValue={1}
+                  onChange={(e) => {
+                    if (audioRef.current) {
+                      audioRef.current.volume = parseFloat(e.target.value);
+                    }
+                  }}
                 />
               </div>
             </div>
