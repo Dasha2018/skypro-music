@@ -32,7 +32,6 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-
 }
 
 .notfound_text1 {
@@ -85,4 +84,5 @@
   border: none;
   border-radius: 6px;
   margin-top: 36px;
+  cursor: pointer;
 }
