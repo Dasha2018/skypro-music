@@ -16,6 +16,7 @@ export default function SideBar() {
                 alt="day's playlist"
                 width={250}
                 height={170}
+                priority
               />
             </Link>
           </div>

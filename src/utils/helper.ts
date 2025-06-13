@@ -28,24 +28,3 @@ export function getUniqueValuesByKey(
   });
   return Array.from(uniqueValue);
 }
-
-/* export function getUniqueValuesByKey(
-  arr: MusicData[],
-  key: keyof MusicData,
-): string[] {
-  const uniqueValue = new Set<string>();
-  arr.forEach((item) => {
-    const value = item[key];
-
-    if (Array.isArray(value)) {
-      value.forEach((v) => {
-        if (v) {
-          uniqueValue.add(v);
-        }
-      });
-    } else if (typeof value == 'string') {
-      uniqueValue.add(value);
-    }
-  });
-  return Array.from(uniqueValue);
-} */

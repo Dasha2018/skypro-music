@@ -57,7 +57,6 @@
   max-width: 248px;
   box-sizing: border-box;
 
-
   &::-webkit-scrollbar {
     width: 4px;
   }
