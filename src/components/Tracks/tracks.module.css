@@ -7,6 +7,10 @@
   -ms-flex-direction: column;
   flex-direction: column;
   overflow-y: auto;
+  max-height: 500px;
+  scrollbar-width: thin;
+  scrollbar-color: #ffffff transparent;
+  padding-right: 8px;
 }
 
 .playlist__item {
@@ -131,4 +135,26 @@
   line-height: 24px;
   text-align: right;
   color: #696969;
+}
+
+.rectangleAnimation {
+  animation: pulse 1.2s infinite ease-in-out;
+}
+.rectangleStatic {
+  animation: none;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
+  50% {
+    transform: scale(1.3);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0.6;
+  }
 }
