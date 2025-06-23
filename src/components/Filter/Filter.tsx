@@ -95,7 +95,6 @@ export default function Filter() {
         </div>
       </div>
 
-      {/* Показываем соответствующий список */}
       {activeFilter === 'author' && renderFilterList(authors)}
       {activeFilter === 'year' && renderFilterList(years)}
       {activeFilter === 'genre' && renderFilterList(genres)}
