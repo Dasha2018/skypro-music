@@ -10,7 +10,10 @@ interface ErrorResponse {
   message: string;
 }
 
-export async function login(email: string, password: string): Promise<AuthResponse> {
+export async function login(
+  email: string,
+  password: string,
+): Promise<AuthResponse> {
   const res = await fetch(`${API_URL}/user/login/`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
@@ -25,7 +28,10 @@ export async function login(email: string, password: string): Promise<AuthRespon
   return res.json();
 }
 
-export async function signup(email: string, password: string): Promise<AuthResponse> {
+export async function signup(
+  email: string,
+  password: string,
+): Promise<AuthResponse> {
   const res = await fetch(`${API_URL}/user/signup/`, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },

@@ -1,36 +1,24 @@
 'use client';
 
-import styles from './signup.module.css';
+import styles from './signin.module.css';
 import classNames from 'classnames';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { signup } from '@/services/auth/authApi';
+import { login } from '@/services/auth/authApi';
 
-export default function SignUp() {
+export default function Signin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [repeatPassword, setRepeatPassword] = useState('');
   const [error, setError] = useState('');
   const router = useRouter();
 
-  const handleSignup = async () => {
+  const handleLogin = async () => {
     setError('');
-
-    if (!email || !password || !repeatPassword) {
-      setError('Все поля обязательны');
-      return;
-    }
-
-    if (password !== repeatPassword) {
-      setError('Пароли не совпадают');
-      return;
-    }
-
     try {
-      const user = await signup(email, password);
-      console.log('Registered:', user);
+      const user = await login(email, password);
+      console.log('Logged in:', user);
       router.push('/music/main');
     } catch (err: unknown) {
       if (err instanceof Error) {
@@ -43,11 +31,11 @@ export default function SignUp() {
 
   return (
     <>
-      <Link href="/music/main">
+      <a href="/music/main">
         <div className={styles.modal__logo}>
           <Image src="/img/logo_modal.png" alt="logo" width={140} height={21} />
         </div>
-      </Link>
+      </a>
       <input
         className={classNames(styles.modal__input, styles.login)}
         type="text"
@@ -62,23 +50,19 @@ export default function SignUp() {
         value={password}
         onChange={(e) => setPassword(e.target.value)}
       />
-      <input
-        className={styles.modal__input}
-        type="password"
-        placeholder="Повторите пароль"
-        value={repeatPassword}
-        onChange={(e) => setRepeatPassword(e.target.value)}
-      />
       <div className={styles.errorContainer}>
         {error && <p style={{ color: 'red' }}>{error}</p>}
       </div>
       <button
         type="button"
-        onClick={handleSignup}
-        className={styles.modal__btnSignupEnt}
+        onClick={handleLogin}
+        className={styles.modal__btnEnter}
       >
-        Зарегистрироваться
+        Войти
       </button>
+      <Link href={'/auth/signup'} className={styles.modal__btnSignup}>
+        Зарегистрироваться
+      </Link>
     </>
   );
 }
