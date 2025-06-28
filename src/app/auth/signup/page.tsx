@@ -4,47 +4,71 @@ import styles from './signup.module.css';
 import classNames from 'classnames';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, ChangeEvent } from 'react';
+import { registerUserReturn } from '@/services/auth/authApi';
+import { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
-import { signup } from '@/services/auth/authApi';
 
 export default function SignUp() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [repeatPassword, setRepeatPassword] = useState('');
-  const [error, setError] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+
   const router = useRouter();
+  const onChangeEmail = (e: ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
 
-  const handleSignup = async () => {
-    setError('');
+  const onChangePassword = (e: ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  };
 
-    if (!email || !password || !repeatPassword) {
-      setError('Все поля обязательны');
-      return;
-    }
+  const onChangeRepeatPassword = (e: ChangeEvent<HTMLInputElement>) => {
+    setRepeatPassword(e.target.value);
+  };
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailRegex.test(email)) {
-      setError('Введите корректный email');
-      return;
+  const onSubmit = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>,
+  ) => {
+    e.preventDefault();
+    setErrorMessage('');
+
+    if (!email.trim() || !password.trim() || !repeatPassword.trim()) {
+      return setErrorMessage('Заполните все поля');
     }
 
     if (password !== repeatPassword) {
-      setError('Пароли не совпадают');
-      return;
+      return setErrorMessage('Пароли не совпадают');
     }
 
+    setIsLoading(true);
+
     try {
-      console.log('Отправка на сервер:', { email, password });
-      const user = await signup(email, password);
-      console.log('Registered:', user);
+      const response = await registerUserReturn({
+        email,
+        password,
+        username: email,
+      });
+      console.log(response);
       router.push('/music/main');
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
+    } catch (error) {
+      if (error instanceof AxiosError) {
+        if (error.response) {
+          setErrorMessage(
+            error.response.data.message || 'Ошибка при регистрации',
+          );
+        } else if (error.request) {
+          setErrorMessage('Нет соединения с сервером');
+        } else {
+          setErrorMessage('Произошла неизвестная ошибка');
+        }
       } else {
-        setError('Неизвестная ошибка');
+        setErrorMessage('Ошибка на клиенте');
       }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -60,33 +84,36 @@ export default function SignUp() {
         type="text"
         placeholder="Почта"
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={onChangeEmail}
       />
       <input
         className={styles.modal__input}
         type="password"
         placeholder="Пароль"
         value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        onChange={onChangePassword}
       />
       <input
         className={styles.modal__input}
         type="password"
         placeholder="Повторите пароль"
         value={repeatPassword}
-        onChange={(e) => setRepeatPassword(e.target.value)}
+        onChange={onChangeRepeatPassword}
       />
-      <div className={styles.errorContainer}>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-      </div>
+      <div className={styles.errorContainer}>{errorMessage}</div>
       <button
         type="button"
-        onClick={handleSignup}
+        onClick={onSubmit}
         className={styles.modal__btnSignupEnt}
+        disabled={isLoading}
       >
         Зарегистрироваться
       </button>
-      <Link href={'/auth/signin'}>Вернуться ко входу</Link>
+      <div style={{ marginTop: '16px' }}>
+        <Link href="/auth/signin" className={styles.modal__btnBack}>
+          Вернуться ко входу
+        </Link>
+      </div>
     </>
   );
 }

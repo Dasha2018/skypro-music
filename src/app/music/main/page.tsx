@@ -1,27 +1,31 @@
 'use client';
-import Navigation from '@/components/Navigation/Navigation';
-import styles from '../main/page.module.css';
-import CenterBlock from '@/components/CenterBlock/CenterBlock';
-import SideBar from '@/components/SideBar/SideBar';
-import Bar from '@/components/Bar/Bar';
-import { useEffect } from 'react';
-import { getTracks } from '@/services/tracks/tracksApi';
 
-export default function Home() {
+import CenterBlock from '@/components/CenterBlock/CenterBlock';
+import { useEffect, useState } from 'react';
+import { getTracks } from '@/services/tracks/tracksApi';
+import { MusicData } from '@/sharedTypes/sharedTypes';
+
+export default function MainPage() {
+  const [tracks, setTracks] = useState<MusicData[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+
   useEffect(() => {
-    getTracks();
+    getTracks()
+      .then((data) => {
+        console.log('Треки с сервера:', data);
+        setTracks(data);
+      })
+      .catch(() => {
+        setError('Ошибка загрузки треков');
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
-  return (
-    <div className={styles.wrapper}>
-      <div className={styles.container}>
-        <main className={styles.main}>
-          <Navigation />
-          <CenterBlock />
-          <SideBar />
-        </main>
-        <Bar />
-        <footer className="footer"></footer>
-      </div>
-    </div>
-  );
+
+  if (loading) return <CenterBlock title="Загрузка..." playlist={[]} />;
+  if (error) return <CenterBlock title={error} playlist={[]} />;
+
+  return <CenterBlock title="Треки" playlist={tracks} />;
 }

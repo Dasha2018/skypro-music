@@ -4,29 +4,58 @@ import styles from './signin.module.css';
 import classNames from 'classnames';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useState } from 'react';
+import { ChangeEvent, useState } from 'react';
+import { authUser } from '@/services/auth/authApi';
+import { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
-import { login } from '@/services/auth/authApi';
 
 export default function Signin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
-  const router = useRouter();
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleLogin = async () => {
-    setError('');
-    try {
-      const user = await login(email, password);
-      console.log('Logged in:', user);
-      router.push('/music/main');
-    } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError('Неизвестная ошибка');
-      }
+  const router = useRouter();
+  const onChangeEmail = (e: ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
+
+  const onChangePassword = (e: ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+  };
+
+  const onSubmit = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+    setErrorMessage('');
+
+    if (!email.trim() || !password.trim()) {
+      return setErrorMessage('Заполните все поля');
     }
+    setIsLoading(true);
+
+    authUser({ email, password })
+      .then((res) => {
+        console.log(res);
+        router.push('/music/main');
+      })
+      .catch((error) => {
+        if (error instanceof AxiosError) {
+          if (error.response) {
+            console.log(error.response.data);
+            console.log(error.response.status);
+            console.log(error.response.headers);
+            setErrorMessage(error.response.data.message);
+          } else if (error.request) {
+            console.log(error.request);
+            setErrorMessage('Отсутствует интернет, повторите попытку позднее');
+          } else {
+            setErrorMessage('Неизвестная ошибка, повторите попытку позднее');
+          }
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
   };
 
   return (
@@ -41,21 +70,20 @@ export default function Signin() {
         type="text"
         placeholder="Почта"
         value={email}
-        onChange={(e) => setEmail(e.target.value)}
+        onChange={onChangeEmail}
       />
       <input
         className={styles.modal__input}
         type="password"
         placeholder="Пароль"
         value={password}
-        onChange={(e) => setPassword(e.target.value)}
+        onChange={onChangePassword}
       />
-      <div className={styles.errorContainer}>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
-      </div>
+      <div className={styles.errorContainer}>{errorMessage}</div>
       <button
         type="button"
-        onClick={handleLogin}
+        disabled={isLoading}
+        onClick={onSubmit}
         className={styles.modal__btnEnter}
       >
         Войти

@@ -1,47 +1,32 @@
-const API_URL = 'https://webdev-music-003b5b991590.herokuapp.com';
+import axios from 'axios';
+import { BASE_URL } from '../constants';
 
-interface AuthResponse {
+type authUserProps = {
   email: string;
+  password: string;
+};
+type registerUserProps = {
+  email: string;
+  password: string;
   username: string;
-  _id: number;
-}
+};
+type authUserReturn = { email: string; username: string; _id: number };
+type registerUserReturn = { username: string; email: string; _id: number };
 
-interface ErrorResponse {
-  message: string;
-}
-
-export async function login(
-  email: string,
-  password: string,
-): Promise<AuthResponse> {
-  const res = await fetch(`${API_URL}/user/login/`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ email, password }),
+export const authUser = (data: authUserProps): Promise<authUserReturn> => {
+  return axios.post(BASE_URL + '/user/login/', data, {
+    headers: {
+      'content-type': 'application/json',
+    },
   });
+};
 
-  if (!res.ok) {
-    const err: ErrorResponse = await res.json();
-    throw new Error(err.message || 'Ошибка входа');
-  }
-
-  return res.json();
-}
-
-export async function signup(
-  email: string,
-  password: string,
-): Promise<AuthResponse> {
-  const res = await fetch(`${API_URL}/user/signup/`, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({ email, password }),
+export const registerUserReturn = (
+  data: registerUserProps,
+): Promise<registerUserReturn> => {
+  return axios.post(BASE_URL + '/user/signup/', data, {
+    headers: {
+      'content-type': 'application/json',
+    },
   });
-
-  if (!res.ok) {
-    const err: ErrorResponse = await res.json();
-    throw new Error(err.message || 'Ошибка регистрации');
-  }
-
-  return res.json();
-}
+};
