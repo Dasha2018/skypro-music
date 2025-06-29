@@ -5,11 +5,14 @@ import classNames from 'classnames';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ChangeEvent, useState } from 'react';
-import { authUser } from '@/services/auth/authApi';
+import { authUser, getTokens } from '@/services/auth/authApi';
 import { AxiosError } from 'axios';
 import { useRouter } from 'next/navigation';
+import { useAppDispatch } from '@/store/store';
+import { setAccessToken, setRefreshToken, setUserName } from '@/store/features/authSlice';
 
 export default function Signin() {
+  const dispatch = useAppDispatch();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -34,8 +37,14 @@ export default function Signin() {
     setIsLoading(true);
 
     authUser({ email, password })
+      .then(() => {
+        dispatch(setUserName(email));
+        return getTokens({ email, password });
+      })
       .then((res) => {
         console.log(res);
+        dispatch(setAccessToken(res.access))
+          dispatch(setRefreshToken(res.refresh))
         router.push('/music/main');
       })
       .catch((error) => {

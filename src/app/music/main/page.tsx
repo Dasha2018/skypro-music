@@ -1,31 +1,26 @@
 'use client';
 
 import CenterBlock from '@/components/CenterBlock/CenterBlock';
-import { useEffect, useState } from 'react';
-import { getTracks } from '@/services/tracks/tracksApi';
-import { MusicData } from '@/sharedTypes/sharedTypes';
+
+import { useAppSelector } from '@/store/store';
 
 export default function MainPage() {
-  const [tracks, setTracks] = useState<MusicData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const { fetchError, fetchIsLoading, allTracks } = useAppSelector(
+    (state) => state.tracks,
+  );
 
-  useEffect(() => {
-    getTracks()
-      .then((data) => {
-        console.log('Треки с сервера:', data);
-        setTracks(data);
-      })
-      .catch(() => {
-        setError('Ошибка загрузки треков');
-      })
-      .finally(() => {
-        setLoading(false);
-      });
-  }, []);
+  const title = fetchIsLoading
+    ? 'Загрузка...'
+    : fetchError
+      ? fetchError
+      : 'Треки';
 
-  if (loading) return <CenterBlock title="Загрузка..." playlist={[]} />;
-  if (error) return <CenterBlock title={error} playlist={[]} />;
-
-  return <CenterBlock title="Треки" playlist={tracks} />;
+  return (
+    <CenterBlock
+      tracks={allTracks}
+      isLoading={fetchIsLoading}
+      errorRes={fetchError}
+      title={title}
+    />
+  );
 }

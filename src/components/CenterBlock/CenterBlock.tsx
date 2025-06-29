@@ -9,19 +9,29 @@ import Tracks from '../Tracks/Tracks';
 
 export default function CenterBlock({
   title,
-  playlist,
+  tracks,
+  isLoading,
+  errorRes,
 }: {
   title: ReactNode;
-  playlist: MusicData[];
+  tracks: MusicData[];
+  isLoading?: boolean;
+  errorRes?: string | null;
 }) {
   return (
     <div className={styles.centerblock}>
       <Search />
       <h2 className={styles.centerblock__h2}>{title}</h2>
+
+      {isLoading}
+      {errorRes && <p className={styles.error}>{errorRes}</p>}
+
       <Filter />
       <div className={styles.centerblock__content}>
         <FilterItem />
-        <Tracks playlist={playlist} />
+      
+       <Tracks tracks={tracks} /> 
+       
       </div>
     </div>
   );

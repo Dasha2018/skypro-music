@@ -1,11 +1,11 @@
 import { MusicData } from '@/sharedTypes/sharedTypes';
 
-export function formatTime(time: number) {
-  const minutes = Math.floor(time / 60);
-  const inputSeconds = Math.floor(time % 60);
-  const outputSeconds = inputSeconds < 10 ? `0${inputSeconds}` : inputSeconds;
+export function formatTime(duration?: number | null): string {
+  if (typeof duration !== 'number' || isNaN(duration)) return '--:--';
 
-  return `${minutes}:${outputSeconds}`;
+  const minutes = Math.floor(duration / 60);
+  const seconds = duration % 60;
+  return `${minutes}:${seconds.toString().padStart(2, '0')}`;
 }
 
 export function getUniqueValuesByKey(

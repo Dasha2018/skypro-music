@@ -5,37 +5,53 @@ import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { getSelectionById } from '@/services/tracks/tracksApi';
 import { MusicData } from '@/sharedTypes/sharedTypes';
-
-const playlistTitles: Record<string, string> = {
-  '1': 'Плейлист дня',
-  '2': '100 музыкальных хитов',
-  '3': 'Инди-заряд',
-};
+import { useAppSelector } from '@/store/store';
+import { AxiosError } from 'axios';
 
 export default function PlaylistPage() {
-  const { id } = useParams();
-  const [playlist, setPlaylist] = useState<MusicData[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
+  const params = useParams<{ id: string }>();
+  const { allTracks, fetchIsLoading, fetchError } = useAppSelector(
+    (state) => state.tracks,
+  );
+  const [isLoading, setIsLoading] = useState(true);
+  const [errorRes, setErrorRes] = useState<string | null>(null);
+  const [title, setTitle] = useState('');
+  const [tracks, setTracks] = useState<MusicData[]>([]);
+  const id = params.id;
 
   useEffect(() => {
-    async function fetchPlaylist() {
-      try {
-        const data = await getSelectionById(id as string);
-        setPlaylist(data);
-      } catch {
-        setError('Ошибка загрузки плейлиста');
-      } finally {
-        setLoading(false);
-      }
-    }
-    if (id) fetchPlaylist();
-  }, [id]);
+    if (!id || fetchIsLoading || !allTracks.length) return;
 
-  const title = playlistTitles[id as string] || 'Треки';
+    setIsLoading(true);
+    setErrorRes(null);
 
-  if (loading) return <CenterBlock title="Загрузка..." playlist={[]} />;
-  if (error) return <CenterBlock title={error} playlist={[]} />;
+    getSelectionById(id)
+      .then((res) => {
+        setTitle(res.name);
+        const tracksIds = res.items;
+        const resultTracks = allTracks.filter((el) =>
+          tracksIds.includes(el._id),
+        );
+        setTracks(resultTracks);
+      })
+      .catch((error) => {
+        if (error instanceof AxiosError && error.response?.data) {
+          setErrorRes(error.response.data);
+        } else {
+          setErrorRes('Ошибка при загрузке плейлиста');
+        }
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, [id, fetchIsLoading, allTracks]);
 
-  return <CenterBlock title={title} playlist={playlist} />;
+  return (
+    <CenterBlock
+      title={isLoading ? 'Загрузка...' : errorRes || title}
+      tracks={tracks}
+      errorRes={errorRes || fetchError}
+      isLoading={isLoading}
+    />
+  );
 }

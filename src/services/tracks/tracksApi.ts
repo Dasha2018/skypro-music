@@ -11,12 +11,25 @@ export const getTracks = (): Promise<MusicData[]> => {
     .get('/catalog/track/all/')
     .then((res) => res.data.data)
     .catch((err) => {
-      console.error('Ошибка при загрузке треков:', err);
       throw err;
     });
 };
 
-export const getSelectionById = async (id: string): Promise<MusicData[]> => {
+export const getSelectionById = async (
+  id: string,
+): Promise<{
+  name: string;
+  items: number[];
+}> => {
   const response = await api.get(`/catalog/selection/${id}/`);
-  return response.data.data.items;
+  const data = response.data.data;
+
+  if (!data) {
+    throw new Error(`Плейлист с ID ${id} не найден`);
+  }
+
+  return {
+    name: data.name,
+    items: data.items,
+  };
 };
