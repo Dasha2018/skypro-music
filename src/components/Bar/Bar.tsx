@@ -204,7 +204,7 @@ export default function Bar() {
                 className={classnames(
                   styles.player__btnShuffle,
                   styles.btnIcon,
-                  { [styles.activeIcon]: isShuffle }, // <-- активный класс
+                  { [styles.activeIcon]: isShuffle },
                 )}
               >
                 <svg className={styles.player__btnShuffleSvg}>

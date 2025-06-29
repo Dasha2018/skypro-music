@@ -11,28 +11,36 @@ import {
 import { MusicData } from '@/sharedTypes/sharedTypes';
 
 type trackProp = {
-  playlist: MusicData[];
+  tracks: MusicData[] | undefined;
 };
 
-export default function Tracks({ playlist }: trackProp) {
+export default function Tracks({ tracks }: trackProp) {
   const dispatch = useAppDispatch();
   const currentTrack = useAppSelector((state) => state.tracks.currentTrack);
   const isPlay = useAppSelector((state) => state.tracks.isPlay);
 
   const onClickTrack = (track: MusicData) => {
+    if (!tracks) return;
     dispatch(setCurrentTrack(track));
-    dispatch(setCurrentPlaylist(playlist));
+    dispatch(setCurrentPlaylist(tracks));
     dispatch(setIsPlay(true));
   };
+
+  if (!Array.isArray(tracks)) {
+    return (
+      <div className={styles.content__playlist}>Нет треков для отображения</div>
+    );
+  }
+ 
 
   return (
     <div className={styles.content__playlist}>
       <div className={styles.scrollContainer}>
-        {playlist.map((track) => (
+        {tracks.map((track, index) => (
           <div
             className={styles.playlist__item}
             onClick={() => onClickTrack(track)}
-            key={track._id}
+            key={`${track._id}-${track.name}-${index}`}
           >
             <div className={styles.playlist__track}>
               <div className={styles.track__title}>

@@ -1,5 +1,5 @@
 import Navigation from '@/components/Navigation/Navigation';
-import styles from './page.module.css';
+import styles from './music/main/page.module.css';
 import Link from 'next/link';
 import Image from 'next/image';
 import Bar from '@/components/Bar/Bar';
@@ -28,7 +28,7 @@ export default function NotFound() {
             Возможно, она была удалена <br /> или перенесена на другой адрес
           </p>
           <div className={styles.nontound_button}>
-            <Link href="/">
+            <Link href="/music/main">
               <button className={styles.nontound_buttontext}>
                 Вернуться на главную
               </button>

@@ -3,24 +3,35 @@ import Image from 'next/image';
 import Link from 'next/link';
 import styles from './navigation.module.css';
 import { useState } from 'react';
+import { useAppDispatch } from '@/store/store';
+import { clearUser } from '@/store/features/authSlice';
+import { useRouter } from 'next/navigation';
 
 export default function Navigation() {
   const [isOpen, setIsOpen] = useState(false);
-
+  const dispatch = useAppDispatch();
+  const router = useRouter();
   const toggleMenu = () => {
     setIsOpen(!isOpen);
+  };
+  const logout = () => {
+    dispatch(clearUser());
+    router.push('/auth/signin');
   };
 
   return (
     <nav className={styles.main__nav}>
       <div className={styles.nav__logo}>
-        <Image
-          width={250}
-          height={170}
-          className={styles.logo__image}
-          src="/img/logo.png"
-          alt={'logo'}
-        />
+        <Link href="/music/main">
+          <Image
+            width={250}
+            height={170}
+            className={styles.logo__image}
+            src="/img/logo.png"
+            alt="logo"
+            priority
+          />
+        </Link>
       </div>
       <div
         className={`${styles.nav__burger} ${isOpen ? styles.open : ''}`}
@@ -44,9 +55,9 @@ export default function Navigation() {
             </Link>
           </li>
           <li className={styles.menu__item}>
-            <Link href="../signin" className={styles.menu__link}>
+            <p onClick={logout} className={styles.menu__link}>
               Войти
-            </Link>
+            </p>
           </li>
         </ul>
       </div>

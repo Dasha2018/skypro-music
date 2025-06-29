@@ -6,12 +6,15 @@
   -webkit-box-direction: normal;
   -ms-flex-direction: column;
   flex-direction: column;
+  min-height: 0;
   overflow-y: auto;
   max-height: 500px;
   scrollbar-width: thin;
   scrollbar-color: #ffffff transparent;
   padding-right: 8px;
+  color: #ffffff ;
 }
+
 
 .playlist__item {
   width: 100%;
