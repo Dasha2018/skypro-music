@@ -6,15 +6,21 @@ type initialStateType = {
   isPlay: boolean;
   isShuffle: boolean;
   shuffledPlaylist: MusicData[];
-  playlist: MusicData[];
+  tracks: MusicData[];
+  allTracks: MusicData[];
+  fetchError: null | string;
+  fetchIsLoading: boolean;
 };
 
 const initialState: initialStateType = {
   currentTrack: null,
   isPlay: false,
   isShuffle: false,
-  playlist: [],
+  tracks: [],
   shuffledPlaylist: [],
+  allTracks: [],
+  fetchError: null,
+  fetchIsLoading: true,
 };
 
 const trackSlice = createSlice({
@@ -25,8 +31,8 @@ const trackSlice = createSlice({
       state.currentTrack = action.payload;
     },
     setCurrentPlaylist: (state, action: PayloadAction<MusicData[]>) => {
-      state.playlist = action.payload;
-      state.shuffledPlaylist = [...state.playlist].sort(
+      state.tracks = action.payload;
+      state.shuffledPlaylist = [...state.tracks].sort(
         () => Math.random() - 0.5,
       );
     },
@@ -37,11 +43,11 @@ const trackSlice = createSlice({
       state.isShuffle = !state.isShuffle;
     },
     setNextTrack: (state) => {
-      if (state.currentTrack && state.playlist.length > 0) {
+      if (state.currentTrack && state.tracks.length > 0) {
         const playlist = state.isShuffle
           ? state.shuffledPlaylist
-          : state.playlist;
-        const curIndex = state.playlist.findIndex(
+          : state.tracks;
+        const curIndex = state.tracks.findIndex(
           (el) => el._id === state.currentTrack?._id,
         );
         const nextIndex = curIndex + 1;
@@ -52,16 +58,25 @@ const trackSlice = createSlice({
       }
     },
     setPrevTrack: (state) => {
-      if (state.currentTrack && state.playlist.length > 0) {
-        const curIndex = state.playlist.findIndex(
+      if (state.currentTrack && state.tracks.length > 0) {
+        const curIndex = state.tracks.findIndex(
           (el) => el._id === state.currentTrack?._id,
         );
         const prevIndex = curIndex - 1;
 
         if (prevIndex < 0) return;
 
-        state.currentTrack = state.playlist[prevIndex];
+        state.currentTrack = state.tracks[prevIndex];
       }
+    },
+    setAllTracks: (state, action: PayloadAction<MusicData[]>) => {
+      state.allTracks = action.payload;
+    },
+    setFetchError: (state, action: PayloadAction<string>) => {
+      state.fetchError = action.payload;
+    },
+    setFetchIsLoading: (state, action: PayloadAction<boolean>) => {
+      state.fetchIsLoading = action.payload;
     },
   },
 });
@@ -73,5 +88,8 @@ export const {
   setNextTrack,
   setPrevTrack,
   toggleShuffle,
+  setAllTracks,
+  setFetchError,
+  setFetchIsLoading,
 } = trackSlice.actions;
 export const trackSliceReducer = trackSlice.reducer;
