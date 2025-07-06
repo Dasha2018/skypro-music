@@ -1,5 +1,8 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { MusicData } from '@/sharedTypes/sharedTypes';
+import { loadFavoriteTracks } from './trackThunks';
+import { removeFavoriteTrack } from './removeFavoriteTrack';
+import { addFavoriteTrack } from './addFavoriteTrack';
 
 type initialStateType = {
   currentTrack: null | MusicData;
@@ -7,6 +10,7 @@ type initialStateType = {
   isShuffle: boolean;
   shuffledPlaylist: MusicData[];
   tracks: MusicData[];
+  favoriteTracks: MusicData[];
   allTracks: MusicData[];
   fetchError: null | string;
   fetchIsLoading: boolean;
@@ -19,6 +23,7 @@ const initialState: initialStateType = {
   tracks: [],
   shuffledPlaylist: [],
   allTracks: [],
+  favoriteTracks: [],
   fetchError: null,
   fetchIsLoading: true,
 };
@@ -47,7 +52,7 @@ const trackSlice = createSlice({
         const playlist = state.isShuffle
           ? state.shuffledPlaylist
           : state.tracks;
-        const curIndex = state.tracks.findIndex(
+        const curIndex = playlist.findIndex(
           (el) => el._id === state.currentTrack?._id,
         );
         const nextIndex = curIndex + 1;
@@ -59,18 +64,24 @@ const trackSlice = createSlice({
     },
     setPrevTrack: (state) => {
       if (state.currentTrack && state.tracks.length > 0) {
-        const curIndex = state.tracks.findIndex(
+        const playlist = state.isShuffle
+          ? state.shuffledPlaylist
+          : state.tracks;
+        const curIndex = playlist.findIndex(
           (el) => el._id === state.currentTrack?._id,
         );
         const prevIndex = curIndex - 1;
 
         if (prevIndex < 0) return;
 
-        state.currentTrack = state.tracks[prevIndex];
+        state.currentTrack = playlist[prevIndex];
       }
     },
     setAllTracks: (state, action: PayloadAction<MusicData[]>) => {
       state.allTracks = action.payload;
+    },
+    setFavoriteTracks: (state, action: PayloadAction<MusicData[]>) => {
+      state.favoriteTracks = action.payload;
     },
     setFetchError: (state, action: PayloadAction<string>) => {
       state.fetchError = action.payload;
@@ -78,6 +89,57 @@ const trackSlice = createSlice({
     setFetchIsLoading: (state, action: PayloadAction<boolean>) => {
       state.fetchIsLoading = action.payload;
     },
+    addLikedTracks: (state, action: PayloadAction<MusicData>) => {
+      state.favoriteTracks = [...state.favoriteTracks, action.payload];
+    },
+    removeLikedTracks: (state, action: PayloadAction<MusicData>) => {
+      state.favoriteTracks = state.favoriteTracks.filter(
+        (track) => track._id !== action.payload._id,
+      );
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+
+      .addCase(addFavoriteTrack.pending, (state) => {
+        state.fetchIsLoading = true;
+        state.fetchError = null;
+      })
+      .addCase(addFavoriteTrack.fulfilled, (state, action) => {
+        state.favoriteTracks = action.payload;
+        state.fetchIsLoading = false;
+        state.fetchError = null;
+      })
+      .addCase(addFavoriteTrack.rejected, (state, action) => {
+        state.fetchIsLoading = false;
+        state.fetchError = action.payload as string;
+      })
+      .addCase(loadFavoriteTracks.pending, (state) => {
+        state.fetchIsLoading = true;
+        state.fetchError = null;
+      })
+      .addCase(loadFavoriteTracks.fulfilled, (state, action) => {
+        state.favoriteTracks = action.payload;
+        state.fetchIsLoading = false;
+      })
+      .addCase(loadFavoriteTracks.rejected, (state, action) => {
+        state.fetchIsLoading = false;
+        state.fetchError = action.payload as string;
+      })
+
+      .addCase(removeFavoriteTrack.pending, (state) => {
+        state.fetchIsLoading = true;
+        state.fetchError = null;
+      })
+      .addCase(removeFavoriteTrack.fulfilled, (state, action) => {
+        state.favoriteTracks = action.payload;
+        state.fetchIsLoading = false;
+        state.fetchError = null;
+      })
+      .addCase(removeFavoriteTrack.rejected, (state, action) => {
+        state.fetchIsLoading = false;
+        state.fetchError = action.payload as string;
+      });
   },
 });
 
@@ -91,5 +153,9 @@ export const {
   setAllTracks,
   setFetchError,
   setFetchIsLoading,
+  setFavoriteTracks,
+  addLikedTracks,
+  removeLikedTracks,
 } = trackSlice.actions;
+
 export const trackSliceReducer = trackSlice.reducer;

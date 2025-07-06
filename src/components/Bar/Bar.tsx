@@ -23,7 +23,7 @@ export default function Bar() {
   const [trackProgress, setTrackProgress] = useState(0);
   const [duration, setDuration] = useState(0);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const playlist = useAppSelector((state) => state.tracks.playlist);
+  const playlist = useAppSelector((state) => state.tracks.tracks);
   const isShuffle = useAppSelector((state) => state.tracks.isShuffle);
 
   useEffect(() => {

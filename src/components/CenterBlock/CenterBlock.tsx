@@ -29,9 +29,8 @@ export default function CenterBlock({
       <Filter />
       <div className={styles.centerblock__content}>
         <FilterItem />
-      
-       <Tracks tracks={tracks} /> 
-       
+
+        <Tracks tracks={tracks} />
       </div>
     </div>
   );
